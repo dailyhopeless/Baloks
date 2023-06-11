@@ -87,18 +87,12 @@ public class Game : MonoBehaviour
         }
     }
     public void PauseButton () {
-        Time.timeScale = 0 ; 
-        isPaused = true;
         audioSource.Pause();
-        blurBackground.SetActive(true);
-        pausePanel.SetActive(true);
+        CanvasPanelOpen(pausePanel);
     }
     public void UnPauseButton() {
-        Time.timeScale = 1;
-        isPaused = false; 
         audioSource.Play();
-        blurBackground.SetActive(false);
-        pausePanel.SetActive(false);
+        CanvasPanelClose(pausePanel);
     }
 
     void StartingGame() {
@@ -414,10 +408,48 @@ public class Game : MonoBehaviour
 
 
     public GameObject GameOverPanel;
+
+
+    //IEnumerator OpenSpeedCanvas() {
+    //    openspeed += Time.deltaTime * fallSpeed;
+    //    return openspeed ;
+    //}
+
+    //IEnumerator Fade()
+    //{
+        
+    //    float cd = (GameOverPanel.GetComponent<CanvasGroup>().alpha = 0);
+    //    for (float alpha = 1f; alpha >= 0; alpha -= 0.1f)
+    //    {
+    //        cd = alpha;
+    //        yield return null;
+    //    }
+    //}
+
+    public void CanvasAlpha(float value , GameObject canvas) {
+        canvas.GetComponent<CanvasGroup>().alpha = value;
+    }
+    public void CanvasPanelOpen(GameObject panelCanvas) {
+        panelCanvas.SetActive(true);
+        blurBackground.SetActive(true);
+        Time.timeScale = 0;
+        isPaused = true;
+    }
+
+    public void CanvasPanelClose(GameObject panelCanvas) {
+        panelCanvas.SetActive(false);
+        blurBackground.SetActive(false);
+        Time.timeScale = 1;
+        isPaused = false;
+    }
+
+
     public void GameOver () {
         UpdateHighScore ();
-
+        CanvasPanelOpen(GameOverPanel);
+       
         Debug.Log("Game Over");
+
     }
 
 }
