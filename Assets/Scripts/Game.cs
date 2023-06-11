@@ -13,12 +13,8 @@ public class Game : MonoBehaviour
     public static Transform[,] grid = new Transform[gridWidth, gridHeight];
 
     private int AddSpeedFall;
-    public static bool MoveRight = false;
-    public static bool MoveLeft = false;
-    public static bool MoveDown = false;
-    public static bool MoveRotate = false;
-    public static Vector2 positionMino = new Vector2(5.0f, 25.0f);
-    public Text highScoreText;
+    public static bool MoveRight, MoveLeft, MoveDown, MoveRotate = false;
+   
     public int scoreOneLine = 5;
     public int scoreTwoLine = 10;
     public int scoreThreeLine = 20;
@@ -32,11 +28,7 @@ public class Game : MonoBehaviour
     public float maxSpeedFall = 9;
     
     public Slider SliderSpeed;
-    public Text hud_score;
-    public Text hud_level;
-    public Text hud_lines;
-    public Text AddSpeedSlide;
-    public Text GameOver_score;
+    public Text hud_score, hud_level, hud_lines, AddSpeedSlide, GameOver_score, highScoreText;
 
     private int numberOfRowsThisTurn = 0;
     public static int currentScore = 0;
@@ -49,6 +41,8 @@ public class Game : MonoBehaviour
     private GameObject previewTetromino;
     private GameObject nextTetromino;
     private bool gameStarted = false;
+
+    public static Vector2 positionMino = new Vector2(5.0f, 25.0f);
     private Vector2 previewTetrominoPosition = new Vector2 (-2.5f, 20);
     
     private int startingHighScore ;
@@ -57,7 +51,12 @@ public class Game : MonoBehaviour
     public GameObject pausePanel;
     public GameObject blurBackground;
 
-    
+    private float animScore;
+    private float animHighScore;
+    private float updateAnimValueHighScore;
+    public float speedcount = 10.0f;
+
+
 
     void Start()
     {
@@ -65,7 +64,7 @@ public class Game : MonoBehaviour
         SpawnNextTetromino ();
         audioSource = GetComponent<AudioSource>();
         UnPauseButton();
-     
+        
         
     }
     void Update() {
@@ -76,7 +75,6 @@ public class Game : MonoBehaviour
         UpdateSpeed(AddSpeedFall);
         UpdateNewHighScore();
         CheckUserInput();
-
     }
 
     void CheckUserInput () {
@@ -117,9 +115,48 @@ public class Game : MonoBehaviour
             PlayerPrefs.SetInt("highscore", currentScore); 
         }
     }
+
+    private int AnimCountScore()
+    {
+        if (animScore < currentScore)
+        {
+            animScore += (fallSpeed * Time.deltaTime) * speedcount;
+            return (int)animScore;
+        }
+        return currentScore;
+    }
+
+    public void UpdateUI()
+    {
+        //GameOver_score.text = currentScore.ToString();
+        hud_score.text = AnimCountScore().ToString();
+        hud_level.text = currentLevel.ToString();
+        hud_lines.text = numLinesCleared.ToString();
+        SliderSpeed.minValue = currentLevel;
+    }
+    
     void UpdateNewHighScore() {
-        if (startingHighScore <= currentScore){
-            highScoreText.text = currentScore.ToString();
+        if (startingHighScore < currentScore && AnimCountScore() == currentScore)
+        {
+            if (startingHighScore == 0)
+            {
+                animHighScore += (fallSpeed * Time.deltaTime) * speedcount;
+                if (animHighScore >= currentScore)
+                {
+                    animHighScore = currentScore;
+                    
+                }
+                highScoreText.text = animHighScore.ToString("0");
+            }
+            else {
+                //animHighScore = startingHighScore;
+                updateAnimValueHighScore = startingHighScore + (animHighScore += (fallSpeed * Time.deltaTime) * speedcount) ;
+                if (updateAnimValueHighScore >= currentScore) {
+                    updateAnimValueHighScore = currentScore;
+                }
+                highScoreText.text = updateAnimValueHighScore.ToString("0");
+            }
+            
         }
     }
     void UpdateLevel(int value) {
@@ -136,9 +173,9 @@ public class Game : MonoBehaviour
       
         if (value > currentLevel ) {
            
-            fallSpeed = 1.0f - ((float)value * 0.1f );
+            fallSpeed = 1.0f - (value * 0.1f );
         } else {
-            fallSpeed = 1.0f - ((float)currentLevel * 0.1f);
+            fallSpeed = 1.0f - (currentLevel * 0.1f);
             if (maxSpeedFall < currentLevel){
                 fallSpeed = 1.0f - (maxSpeedFall * 0.1f);
             }
@@ -151,14 +188,8 @@ public class Game : MonoBehaviour
         AddSpeedSlide.text = value.ToString();
        
     }
-    public void UpdateUI () {
-        GameOver_score.text = currentScore.ToString();
-        
-        hud_score.text = currentScore.ToString();
-        hud_level.text = currentLevel.ToString();
-        hud_lines.text = numLinesCleared.ToString();
-        SliderSpeed.minValue = currentLevel;
-    }
+    
+   
     public void UpdateScore () {
         if (numberOfRowsThisTurn > 0 ){
             if (numberOfRowsThisTurn == 1){
@@ -312,34 +343,40 @@ public class Game : MonoBehaviour
     public Vector2 Round (Vector2 pos){
         return new Vector2 (Mathf.Round(pos.x), Mathf.Round(pos.y));
     }
+
+    public bool CheatMino = false;
     string GetRandomTetromino () {
         int randomTetromino = Random.Range(1, 9);
-        string randomTetrominoName = "Prefabs/Tetrimono_T";
-        switch (randomTetromino){
-            case 1:
-            randomTetrominoName = "Prefabs/Tetrimono_T";
-            break;
-            case 2:
-            randomTetrominoName = "Prefabs/Tetrimono_I";
-            break;
-            case 3:
-            randomTetrominoName = "Prefabs/Tetrimono_O";
-            break;
-            case 4:
-            randomTetrominoName = "Prefabs/Tetrimono_J";
-            break;
-            case 5:
-            randomTetrominoName = "Prefabs/Tetrimono_L";
-            break;
-            case 6:
-            randomTetrominoName = "Prefabs/Tetrimono_S";
-            break;
-            case 7:
-            randomTetrominoName = "Prefabs/Tetrimono_Z";
-            break;
-            case 8:
-            randomTetrominoName = "Prefabs/Tetrimono_V";
-            break;
+        string randomTetrominoName = "Prefabs/Tetrimono_O";
+        if (!CheatMino)
+        {
+            switch (randomTetromino)
+            {
+                case 1:
+                    randomTetrominoName = "Prefabs/Tetrimono_T";
+                    break;
+                case 2:
+                    randomTetrominoName = "Prefabs/Tetrimono_I";
+                    break;
+                case 3:
+                    randomTetrominoName = "Prefabs/Tetrimono_O";
+                    break;
+                case 4:
+                    randomTetrominoName = "Prefabs/Tetrimono_J";
+                    break;
+                case 5:
+                    randomTetrominoName = "Prefabs/Tetrimono_L";
+                    break;
+                case 6:
+                    randomTetrominoName = "Prefabs/Tetrimono_S";
+                    break;
+                case 7:
+                    randomTetrominoName = "Prefabs/Tetrimono_Z";
+                    break;
+                case 8:
+                    randomTetrominoName = "Prefabs/Tetrimono_V";
+                    break;
+            }
         }
         return randomTetrominoName;
     }
@@ -376,8 +413,10 @@ public class Game : MonoBehaviour
     }
 
 
+    public GameObject GameOverPanel;
     public void GameOver () {
         UpdateHighScore ();
+
         Debug.Log("Game Over");
     }
 
