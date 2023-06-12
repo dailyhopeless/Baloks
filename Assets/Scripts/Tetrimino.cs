@@ -13,13 +13,13 @@ public class Tetrimino : MonoBehaviour
     public AudioClip landSound;
 
     private AudioSource audioSource;
-    private float individualScoreTime;
+    //private float individualScoreTime;
 
     public static bool pushDownKey = true;
 
-    private float continousVerticalSpeed = 0.05f;
-    private float continuousHorizontalSpeed = 0.1f;
-    private float buttonDownWaitMax = 0.2f;
+    private readonly float continousVerticalSpeed = 0.05f;
+    private readonly float continuousHorizontalSpeed = 0.1f;
+    private readonly float buttonDownWaitMax = 0.2f;
     private float verticalTimer = 0;
     private float horizontalTimer = 0;
     private float buttonDownWaitTimerHorizontal = 0;
@@ -222,6 +222,7 @@ public class Tetrimino : MonoBehaviour
             //Game.currentScore += individualScore;
 
             enabled = false;
+            tag = "Untagged";
         }
         fall = Time.time;
     }

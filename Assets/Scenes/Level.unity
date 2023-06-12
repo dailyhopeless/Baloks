@@ -974,6 +974,7 @@ MonoBehaviour:
   pausePanel: {fileID: 1934506979}
   blurBackground: {fileID: 815815845}
   speedcount: 10
+  maxSwaps: 1
   CheatMino: 1
   GameOverPanel: {fileID: 667711560}
 --- !u!82 &424520355
