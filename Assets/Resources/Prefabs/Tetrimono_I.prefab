@@ -294,7 +294,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6b6d54a9e7bad44dab8709fccd5395f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fallSpeed: 1
   allowRotation: 1
   limitRotation: 1
   moveSound: {fileID: 8300000, guid: 0311fbe0acd38d046891c73a203fda59, type: 3}

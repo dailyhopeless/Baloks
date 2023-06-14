@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,19 +12,24 @@ public class GhostTetromino : MonoBehaviour
         foreach (Transform mino in transform) {
             mino.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, .2f);
         }
+        
     }
 
     // Update is called once per frame
     void Update()
     {
+
+
+        //StartCoroutine(FollowActiveTetromino());
+
         FollowActiveTetromino();
         MoveDown();
     }
     void FollowActiveTetromino() {
-        
-        Transform currentActiveTetrominoTranform = GameObject.FindGameObjectWithTag("currentActiveTetromino").transform;
+        Transform currentActiveTetrominoTranform = Game.nextTetromino.transform;
         transform.position = currentActiveTetrominoTranform.position;
         transform.rotation = currentActiveTetrominoTranform.rotation;
+     
 
     }
 
