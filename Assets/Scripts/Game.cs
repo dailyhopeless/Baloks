@@ -20,9 +20,9 @@ public class Game : MonoBehaviour
     public int scoreThreeLine = 20;
     public int scoreFourLine = 50;
 
-    private int currentLevel ;
-    public int customLevel = 0;
-    private int numLinesCleared = 0;
+    public static int currentLevel ;
+    public static int customLevel ;
+    public static int numLinesCleared = 0;
 
     public static float fallSpeed = 1.0f;
     public float maxSpeedFall = 9;
@@ -42,9 +42,9 @@ public class Game : MonoBehaviour
 
     public static Vector2 positionMino = new Vector2(5.0f, 25.0f);
     private Vector2 previewTetrominoPosition = new Vector2 (-2.5f, 20);
-    private Vector2 savedTetrominoPosition = new Vector2(-2.5f, 10);
+    private Vector2 savedTetrominoPosition = new Vector2(-2.5f, 8);
 
-    private int startingHighScore ;
+    public static int startingHighScore ;
 
     private float animScore;
     private float animHighScore;
@@ -54,15 +54,18 @@ public class Game : MonoBehaviour
     public int maxSwaps = 2;
     private int currentSwaps = 1;
 
-    private readonly CanvasUi panelUi;
+    public static bool gameover ;
 
+
+    public static int tempScore;
 
 
     void Start()
     {
         StartingGame();
         SpawnNextTetromino ();
-      
+        TempHighScore();
+
         //UnPauseButton();
         Time.timeScale = 1;
 
@@ -107,10 +110,18 @@ public class Game : MonoBehaviour
         highScoreText.text = startingHighScore.ToString();
     
     }
-    void UpdateHighScore (){
+    public void UpdateHighScore (){
         if (currentScore > startingHighScore) {
             PlayerPrefs.SetInt("highscore", currentScore); 
         }
+    }
+    public void TempHighScore()
+    {
+        if (!gameover)
+        {
+           PlayerPrefs.SetInt("tempscore", startingHighScore);
+        }
+        tempScore = PlayerPrefs.GetInt("tempscore");
     }
 
     private int AnimCountScore()
@@ -140,7 +151,7 @@ public class Game : MonoBehaviour
               
                 if (animHighScore < currentScore)
                 {
-                    animHighScore += (fallSpeed * Time.deltaTime) * 50;
+                    animHighScore += (fallSpeed * Time.deltaTime) * 30;
                 }
                 highScoreText.text = Mathf.Floor(animHighScore).ToString();
             }
@@ -149,22 +160,23 @@ public class Game : MonoBehaviour
                 
                 if (animHighScore < (currentScore - startingHighScore))
                 {
-
-                    animHighScore  += (fallSpeed * Time.deltaTime) * 100;
-                    updateAnimValueHighScore = startingHighScore + animHighScore;
+                    
+                    animHighScore  += (fallSpeed * Time.deltaTime) * 30;
+                    updateAnimValueHighScore = startingHighScore + Mathf.Floor(animHighScore)  ;
                 }
                 
-                highScoreText.text = Mathf.Floor(updateAnimValueHighScore).ToString();
+                highScoreText.text = updateAnimValueHighScore.ToString();
             }
             
 
         }
     }
-    void UpdateLevel(int value) {
+    public void UpdateLevel(int value) {
         currentLevel = customLevel ;
         if (value >= (customLevel * 10))  {
             customLevel = (value / 10 ) + 1 ;  
         }
+        return;
     }
     public void SaveSetting(int value){
        PlayerPrefs.SetInt("speedsettings", value);
@@ -414,6 +426,8 @@ public class Game : MonoBehaviour
             return grid [(int)pos.x, (int)pos.y];
         }
     }
+
+
     public void SpawnNextTetromino () {
         
         if (!gameStarted){
@@ -423,6 +437,7 @@ public class Game : MonoBehaviour
             previewTetromino.GetComponent<Tetrimino>().enabled =false;
             previewTetromino.transform.localScale =  new Vector3(0.6f, 0.6f, 1f);
             nextTetromino.tag = "currentActiveTetromino";
+      
             SpawnGhostTetromino();
 
         }else {
@@ -436,12 +451,14 @@ public class Game : MonoBehaviour
             previewTetromino.GetComponent<Tetrimino>().enabled =false;
             previewTetromino.transform.localScale =  new Vector3(0.6f, 0.6f, 1f);
 
-
+      
             SpawnGhostTetromino();
         }
         currentSwaps = 0;
    
     }
+
+
 
     public void SpawnGhostTetromino() {
         if (GameObject.FindGameObjectWithTag ("currentGhostTetromino") != null)
@@ -461,28 +478,35 @@ public class Game : MonoBehaviour
             GameObject tempSavedTetromino = GameObject.FindGameObjectWithTag("currentSaveTetromino");
 
             tempSavedTetromino.transform.localPosition = new Vector2(gridWidth / 2, gridHeight);
+            tempSavedTetromino.transform.localScale = new Vector3(1f, 1f, 1f);
             if (!CheckIsValidPosition(tempSavedTetromino)) {
                 tempSavedTetromino.transform.localPosition = savedTetrominoPosition;
+                tempSavedTetromino.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
                 return;
             }
             savedTetromno = (GameObject)Instantiate(t.gameObject);
             savedTetromno.GetComponent<Tetrimino>().enabled = false;
             savedTetromno.transform.localPosition = savedTetrominoPosition;
+            savedTetromno.transform.localScale = new Vector3(1f, 1f, 1f);
+            savedTetromno.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
             savedTetromno.tag = "currentSaveTetromino";
 
             nextTetromino = (GameObject)Instantiate(tempSavedTetromino);
             nextTetromino.GetComponent<Tetrimino>().enabled = true;
             nextTetromino.transform.localPosition = new Vector2(gridWidth / 2, gridHeight);
+            nextTetromino.transform.localScale = new Vector3(1f, 1f, 1f);
             nextTetromino.tag = "currentActiveTetromino";
             DestroyImmediate(t.gameObject);
             DestroyImmediate(tempSavedTetromino);
 
             SpawnGhostTetromino();
+          
         }
         else {
             savedTetromno = (GameObject)Instantiate(GameObject.FindGameObjectWithTag("currentActiveTetromino"));
             savedTetromno.GetComponent<Tetrimino>().enabled = false;
             savedTetromno.transform.localPosition = savedTetrominoPosition;
+            savedTetromno.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
             savedTetromno.tag = "currentSaveTetromino";
 
             DestroyImmediate(GameObject.FindGameObjectWithTag("currentActiveTetromino"));
@@ -561,12 +585,17 @@ public class Game : MonoBehaviour
         MoveRotate = true;
     }
     public void RestartButton () {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene("Level");
         
     }
+  
+
 
     public void GameOver () {
         UpdateHighScore ();
+        gameover = true;
+        if (gameover) 
+        FindObjectOfType<CanvasUi>().GameOver();
    
         //CanvasPanelOpen(GameOverPanel);
        

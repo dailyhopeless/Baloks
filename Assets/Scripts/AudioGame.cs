@@ -17,7 +17,9 @@ public class AudioGame : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
         MusicPlayedBg();
+        
     }
 
     // Update is called once per frame
@@ -32,6 +34,9 @@ public class AudioGame : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         audioSource.clip = MainBackSound;
         audioSource.loop = true;
+        audioSource.playOnAwake = true;
+        if (MusicBool())
+            audioSource.Play();
     }
 
     public void PlayLineClearedSound()
@@ -64,7 +69,20 @@ public class AudioGame : MonoBehaviour
         }
         
     }
-    
+    public bool MusicBool()
+    {
+        if (PlayerPrefs.GetInt("SettingsMusic") == 1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    }
+
+
 
 
 

@@ -11,6 +11,7 @@ public class GhostTetromino : MonoBehaviour
         tag = "currentGhostTetromino";
         foreach (Transform mino in transform) {
             mino.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, .2f);
+       
         }
         
     }

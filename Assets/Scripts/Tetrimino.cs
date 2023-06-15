@@ -226,6 +226,7 @@ public class Tetrimino : MonoBehaviour
             if (FindObjectOfType<Game>().CheckIsAboveGrid(this))
             {
                 FindObjectOfType<Game>().GameOver();
+
             }
             
             if (FindObjectOfType<Game>().FullAnimateshowbool())
