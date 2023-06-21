@@ -34,7 +34,7 @@ public class CanvasUi : MonoBehaviour
     public static bool isPaused = false;
     private bool fadeinbool = false;
     private readonly float speedfade = 0.1f;
-    private float fade;
+    public static float fade;
     private float zoom = 0.7f;
 
     public Toggle SettingsMusic;
@@ -150,7 +150,7 @@ public class CanvasUi : MonoBehaviour
     {
         canvas.GetComponentInChildren<RectTransform>().localScale = new Vector2(value, value);
     }
-    private float ZoomIn()
+    public float ZoomIn()
     {
         if (zoom < 1)
         {
@@ -161,7 +161,7 @@ public class CanvasUi : MonoBehaviour
         return zoom;
     }
 
-    private float ZoomOut()
+    public float ZoomOut()
     {
         if (zoom > 0.7f)
             zoom -= (Time.unscaledDeltaTime * speedfade) * 20;
@@ -169,18 +169,18 @@ public class CanvasUi : MonoBehaviour
     }
 
 
-    void CanvasAlpha(float value, GameObject canvas)
+    public void CanvasAlpha(float value, GameObject canvas)
     {
         canvas.GetComponent<CanvasGroup>().alpha = value;
     }
-    private float ZerotoOne()
+    public float ZerotoOne()
     {
         if (fade < 1)
             fade += (Time.unscaledDeltaTime * speedfade) * 30;
         return fade;
     }
 
-    private float OnetoZero()
+    public float OnetoZero()
     {
         if (fade > 0)
             fade -= (Time.unscaledDeltaTime * speedfade) * 20;
@@ -209,7 +209,7 @@ public class CanvasUi : MonoBehaviour
             CanvasScale(ZoomIn(), BackgroundCanvas);
             Time.timeScale = 0;
             isPaused = true;
-            AudioGame.audioSource.Pause();
+            
 
             blurBackground.SetActive(true);
           
@@ -218,14 +218,13 @@ public class CanvasUi : MonoBehaviour
         {
             CanvasAlpha(OnetoZero(), PanelBox);
             CanvasScale(ZoomOut(), BackgroundCanvas);
-            isPaused = false;
             if (OnetoZero() * 10 < 0)
             {
                 isPaused = false;
                 PanelBox.SetActive(false);
                 Time.timeScale = 1;
                 blurBackground.SetActive(false);
-                SetMusic();
+                
                 
                 
             }
@@ -234,20 +233,26 @@ public class CanvasUi : MonoBehaviour
     }
     public void OpenCanvas()
     {
-      
+        AudioGame.audioSource.Pause();
         fadeinbool = true;
         PanelBox.SetActive(true);
     }
     public void PlayAgain()
     {
+       
         SceneManager.LoadScene("Level");
         FindObjectOfType<Game>().UpdateHighScore();
         PlayerPrefs.SetInt("tempscore", PlayerPrefs.GetInt("highscore"));
 
 
     }
+    public void BackMenu(string value)
+    {
+        SceneManager.LoadScene(value);
+    }
     public void CloseCanvas()
     {
+        SetMusic();
         fadeinbool = false;
         
         FindObjectOfType<Game>().SaveSetting(Game.AddSpeedFall);
@@ -255,5 +260,8 @@ public class CanvasUi : MonoBehaviour
         //PanelBox.SetActive(false);
 
     }
+
+  
+
 }
 
