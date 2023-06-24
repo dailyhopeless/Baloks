@@ -13,7 +13,7 @@ public class ButtonFocus : MonoBehaviour
 
     public Sprite FocusSpriteImage;
     public Sprite defaultSprite;
-    public GameObject FocusButton;
+    public GameObject FocusButton; 
     public GameObject ColorButton;
     public GameObject TextButton;
 
@@ -22,6 +22,13 @@ public class ButtonFocus : MonoBehaviour
     public bool smallButton;
     public bool ForSceneManager;
     public bool ForGameObject;
+    public bool ForQuitButton;
+    public bool resetButton;
+
+    /// <summary>
+    /// ButtonFocus dont have back button if want back button call script Fade
+    /// </summary>
+
     [HideInInspector]
     public int NumberScene;
     [HideInInspector]
@@ -32,7 +39,9 @@ public class ButtonFocus : MonoBehaviour
     {
       
     }
-
+    /// <summary>
+    /// Focus for button push add event trigger put in pointer down
+    /// </summary>
     public void Focus (bool value)
     {
         if (value)
@@ -40,7 +49,9 @@ public class ButtonFocus : MonoBehaviour
         StartCoroutine(ButtonAnimate(value));
 
     }
-
+    /// <summary>
+    /// Focusup for effect button add to event triger pointer up
+    /// </summary>
     public void FocusUp(bool value) {
         StartCoroutine(ButtonAnimateUp());
     }
@@ -49,36 +60,40 @@ public class ButtonFocus : MonoBehaviour
         FocusButton.GetComponent<Image>().sprite = FocusSpriteImage;
         if (smallButton)
         {
-
+            ColorButton.GetComponent<Image>().rectTransform.anchoredPosition = new Vector2(0, -0.9f);
+            TextButton.GetComponent<TMPro.TextMeshProUGUI>().rectTransform.anchoredPosition = new Vector2(0 , 1.5f);
         }
         else {
             ColorButton.GetComponent<Image>().rectTransform.sizeDelta = new Vector2(162, 37);
             ColorButton.GetComponent<Image>().rectTransform.anchoredPosition = new Vector2(0.13f, 2);
-        }
-        TextButton.GetComponent<TMPro.TextMeshProUGUI>().rectTransform.anchoredPosition = new Vector2(0.19f, 0);
-        if (ForSceneManager) {
-
-            SceneManager.LoadScene(NumberScene);
+            TextButton.GetComponent<TMPro.TextMeshProUGUI>().rectTransform.anchoredPosition = new Vector2(0.19f, 0);
         }
         yield return new WaitForSeconds(0.2f);
-        if (ForGameObject) {
-           
+        if (ForSceneManager) 
+            SceneManager.LoadScene(NumberScene);
+        if (ForGameObject) 
             ActiveGameObject.SetActive(value);
+        if (ForQuitButton) {
+            Application.Quit();
+            Debug.Log("Quit Games");
         }
         yield return null;
 
     }
     IEnumerator ButtonAnimateUp() {
         FocusButton.GetComponent<Image>().sprite = defaultSprite;
+
         if (smallButton)
         {
-
+            ColorButton.GetComponent<Image>().rectTransform.anchoredPosition = new Vector2(0, 3);
+            TextButton.GetComponent<TMPro.TextMeshProUGUI>().rectTransform.anchoredPosition = new Vector2(0, 4);
         }
         else {
             ColorButton.GetComponent<Image>().rectTransform.sizeDelta = new Vector2(162, 43);
             ColorButton.GetComponent<Image>().rectTransform.anchoredPosition = new Vector2(0.13f, 5);
+            TextButton.GetComponent<TMPro.TextMeshProUGUI>().rectTransform.anchoredPosition = new Vector2(0.19f, 5.97f);
         }
-        TextButton.GetComponent<TMPro.TextMeshProUGUI>().rectTransform.anchoredPosition = new Vector2(0.19f, 5.97f) ;
+       
         yield return null;
     }
 
@@ -93,22 +108,14 @@ public class RandomScript_Editor : Editor {
         DrawDefaultInspector(); // for other non-HideInInspector fields
 
         ButtonFocus script = (ButtonFocus)target;
-
-        // draw checkbox for the bool
-        //script.ForSceneManager = EditorGUILayout.Toggle("For Scene Manager", script.ForSceneManager);
-        if (script.ForSceneManager == true ) 
+        if (script.ForSceneManager == true) {
             script.ForGameObject = false;
-
-        if (script.ForGameObject == true)
+            script.NumberScene = EditorGUILayout.IntField("Direct Scene Number", script.NumberScene);
+        }
+            
+        if (script.ForGameObject == true) {
             script.ForSceneManager = false;
-
-        if (script.ForSceneManager && !script.ForGameObject) // if bool is true, show other fields
-            script.NumberScene = EditorGUILayout.IntField("Direct Scene Number", script.NumberScene)  ;
-
-        if (script.ForGameObject && !script.ForSceneManager)
-        {
             script.ActiveGameObject = EditorGUILayout.ObjectField("Active Object", script.ActiveGameObject, typeof(GameObject), true) as GameObject;
-           
         }
 
     }

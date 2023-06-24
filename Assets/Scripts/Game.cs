@@ -76,13 +76,14 @@ public class Game : MonoBehaviour
         UpdateUI();
         DetectSound();
         UpdateLevel(numLinesCleared);
-        UpdateSpeed(AddSpeedFall);
+        UpdateSpeed(PlayerPrefs.GetInt(PlayerData.speedsettings.ToString()));
         UpdateNewHighScore();
         CheckUserInput();
      
     }
 
     void CheckUserInput () {
+        
         //if(Input.GetKeyUp(KeyCode.P)) {
         //    if (Time.timeScale == 1){
         //        PauseButton();

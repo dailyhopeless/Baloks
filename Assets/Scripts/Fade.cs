@@ -2,14 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 public class Fade : MonoBehaviour
 {
 
     private float fade;
     private float zoom = 0.7f;
 
-    private CanvasGroup Panel;
+    [Header("Fade Options")]
+    public bool useBlurBackground;
 
+    [HideInInspector]
     public GameObject blurPanel;
 
     GameObject textobj;
@@ -18,13 +24,12 @@ public class Fade : MonoBehaviour
    
 
 
-    void Awake()
+    void Start()
     {
         textobj = this.gameObject.transform.GetChild(0).gameObject;
-        Panel = GetComponent<CanvasGroup>();
-        //textobj = this.gameObject.
-        Debug.Log(gameObject.name);
+        gameObject.GetComponent<CanvasGroup>();
         CheckAktive();
+
         //activebool = false;
     }
 
@@ -79,7 +84,8 @@ public class Fade : MonoBehaviour
         //Panel.SetActive(true);
         CanvasAlpha(ZerotoOne(), Panel);
         CanvasScale(ZoomIn(), Background);
-        BlurBackground.SetActive(true);
+        if (useBlurBackground)
+            BlurBackground.SetActive(true);
     }
 
     public void Panelout(GameObject Panel, GameObject Background, GameObject Blurbackground)
@@ -89,7 +95,8 @@ public class Fade : MonoBehaviour
         if (OnetoZero() * 10 < 0)
         {
             gameObject.SetActive(false);
-            Blurbackground.SetActive(false);
+            if (useBlurBackground)
+                Blurbackground.SetActive(false);
             if (!gameObject.activeSelf) {
                 activebool = true;
             }
@@ -118,3 +125,18 @@ public class Fade : MonoBehaviour
 
     }
 }
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(Fade))]
+public class OptionsFadeScript : Editor {
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+        Fade fade = (Fade)target;
+        if (fade.useBlurBackground)
+            fade.blurPanel = EditorGUILayout.ObjectField("Use Background Blur",fade.blurPanel, typeof(GameObject),true ) as GameObject;
+    }
+
+}
+
+#endif

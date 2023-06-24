@@ -248,7 +248,9 @@ public class CanvasUi : MonoBehaviour
     }
     public void BackMenu(string value)
     {
+        Time.timeScale = 1;
         SceneManager.LoadScene(value);
+        
     }
     public void CloseCanvas()
     {
