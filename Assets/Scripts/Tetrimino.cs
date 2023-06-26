@@ -242,7 +242,7 @@ public class Tetrimino : MonoBehaviour
 
             //- Spawn the next piece
 
-            FindObjectOfType<AudioGame>().PlayLandAudio();
+            //FindObjectOfType<AudioGame>().PlayLandAudio();
 
             //Game.currentScore += individualScore;
             

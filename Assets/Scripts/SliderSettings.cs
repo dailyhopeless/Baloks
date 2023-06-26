@@ -14,6 +14,12 @@ public class SliderSettings : MonoBehaviour
     public bool toggleSlider;
     public PlayerData saveData;
 
+    [Header("Default Number")]
+    public int setSliderLong = 4;
+    public int setSlidertoggle = 2;
+
+
+
     [HideInInspector]
     public TMPro.TextMeshProUGUI countSpeedText;
 
@@ -31,19 +37,29 @@ public class SliderSettings : MonoBehaviour
         slider = GetComponent<Slider>();
         slider.onValueChanged.AddListener(delegate { ValueChangeCheck(); });
         slider.value = PlayerPrefs.GetInt(saveData.ToString());
-
-        
-
+    }
+    void Update()
+    {
+        UpdaateSlider();
     }
 
-
+    void UpdaateSlider() {
+        if (PlayerPrefs.GetInt(saveData.ToString()) == 0) {
+            if (longSlider)
+                slider.value = setSliderLong;
+            if (toggleSlider)
+                slider.value = setSlidertoggle;
+        }
+    }
     public void ValueChangeCheck()
     {
+        Checkifnull();
         PlayerPrefs.SetInt(saveData.ToString(), (int)slider.value);
         if(longSlider)
             countSpeedText.text = Mathf.Floor(slider.value).ToString();
-        if (toggleSlider) {
            
+        if (toggleSlider) {
+            slider.value = PlayerPrefs.GetInt(saveData.ToString());
             if (slider.value == 1)
             {
                 ifDisable.SetActive(true);
@@ -56,7 +72,9 @@ public class SliderSettings : MonoBehaviour
                
         }
     }
-
+    /// <summary>
+    /// below for button handdle
+    /// </summary>
     public void HandleButton() {
         if (slider.value == 1)
             slider.value = 2;
@@ -70,13 +88,15 @@ public class SliderSettings : MonoBehaviour
         {
             if (PlayerPrefs.GetInt(saveData.ToString()) == 0)
             {
-                PlayerPrefs.SetInt(saveData.ToString(), 2);
+                PlayerPrefs.SetInt(saveData.ToString(), setSlidertoggle);
+
             }
         }
         else if (longSlider) {
             if (PlayerPrefs.GetInt(saveData.ToString()) == 0) 
             {
-                PlayerPrefs.SetInt(saveData.ToString(), 6);
+                PlayerPrefs.SetInt(saveData.ToString(), setSliderLong);
+                
             }
         }
         

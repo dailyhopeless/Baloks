@@ -10,13 +10,17 @@ public class Fade : MonoBehaviour
 {
 
     private float fade;
-    private float zoom = 0.7f;
+    private float zoom = 0.9f;
 
     [Header("Fade Options")]
     public bool useBlurBackground;
+    [Tooltip("one panel one trigger")]
+    public bool triggerZoomOut;
 
     [HideInInspector]
     public GameObject blurPanel;
+    [HideInInspector]
+    public GameObject buttonClose;
 
     GameObject textobj;
 
@@ -26,13 +30,13 @@ public class Fade : MonoBehaviour
 
     void Start()
     {
+       
         textobj = this.gameObject.transform.GetChild(0).gameObject;
         gameObject.GetComponent<CanvasGroup>();
         CheckAktive();
-
-        //activebool = false;
+        //FindTrigerChild();
+      
     }
-
 
     void Update()
     {
@@ -40,6 +44,9 @@ public class Fade : MonoBehaviour
             Show();
         else
             Hide();
+        if (triggerZoomOut) {
+            Checktriggerclose();
+        }
 
     }
 
@@ -54,20 +61,20 @@ public class Fade : MonoBehaviour
     public float ZerotoOne()
     {
         if (fade < 1)
-            fade += (Time.deltaTime * 0.1f) * 30;
+            fade += (Time.unscaledDeltaTime * 0.1f) * 100;
         return fade;
     }
     public float OnetoZero()
     {
         if (fade > 0)
-            fade -= (Time.deltaTime * 0.1f) * 20;
+            fade -= (Time.unscaledDeltaTime * 0.1f) * 30;
         return fade;
     }
     public float ZoomIn()
     {
         if (zoom < 1)
         {
-            zoom += (Time.deltaTime * 0.1f) * 30;
+            zoom += (Time.unscaledDeltaTime * 0.1f) * 30;
             if ((int)zoom == 1)
                 zoom = 1;
         }
@@ -75,8 +82,8 @@ public class Fade : MonoBehaviour
     }
     public float ZoomOut()
     {
-        if (zoom > 0.7f)
-            zoom -= (Time.deltaTime * 0.1f) * 20;
+        if (zoom > 0.9f)
+            zoom -= (Time.unscaledDeltaTime * 0.1f) * 20;
         return zoom;
     }
     public void Panelin(GameObject Panel, GameObject Background, GameObject BlurBackground)
@@ -86,6 +93,7 @@ public class Fade : MonoBehaviour
         CanvasScale(ZoomIn(), Background);
         if (useBlurBackground)
             BlurBackground.SetActive(true);
+
     }
 
     public void Panelout(GameObject Panel, GameObject Background, GameObject Blurbackground)
@@ -99,6 +107,8 @@ public class Fade : MonoBehaviour
                 Blurbackground.SetActive(false);
             if (!gameObject.activeSelf) {
                 activebool = true;
+                if (triggerZoomOut)
+                    buttonClose.SetActive(true);
             }
         }
     }
@@ -114,7 +124,11 @@ public class Fade : MonoBehaviour
         Panelin(gameObject, textobj, blurPanel);
     }
     void Hide() {
-        Panelout(gameObject, textobj, blurPanel);
+            Panelout(gameObject, textobj, blurPanel);
+    }
+    void Checktriggerclose() { 
+        if(!buttonClose.activeSelf)
+            activebool = false;
     }
 
     public void NotActive() {
@@ -135,6 +149,8 @@ public class OptionsFadeScript : Editor {
         Fade fade = (Fade)target;
         if (fade.useBlurBackground)
             fade.blurPanel = EditorGUILayout.ObjectField("Use Background Blur",fade.blurPanel, typeof(GameObject),true ) as GameObject;
+        if(fade.triggerZoomOut)
+            fade.buttonClose = EditorGUILayout.ObjectField("Add Gameobject empty", fade.buttonClose, typeof(GameObject), true) as GameObject;
     }
 
 }

@@ -141,8 +141,8 @@ public class CanvasUi : MonoBehaviour
         }
         else {
             SettingsMusic.isOn = false;
-            if (PlayerPrefs.GetInt("SettingsMusic") != 0)
-                AudioGame.audioSource.Stop();
+            //if (PlayerPrefs.GetInt("SettingsMusic") != 0)
+               // AudioGame.audioSource.Stop();
         }
     }
 
@@ -233,7 +233,7 @@ public class CanvasUi : MonoBehaviour
     }
     public void OpenCanvas()
     {
-        AudioGame.audioSource.Pause();
+        //AudioGame.audioSource.Pause();
         fadeinbool = true;
         PanelBox.SetActive(true);
     }

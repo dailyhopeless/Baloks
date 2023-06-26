@@ -223,7 +223,7 @@ public class Game : MonoBehaviour
                 FindObjectOfType<AudioGame>().PlayLineClearedSound();
             }
             else if (rowsoundanim == 4) {
-                FindObjectOfType<AudioGame>().PlayLineClearedSoundHight();
+                //FindObjectOfType<AudioGame>().PlayLineClearedSoundHight();
             }
             rowsoundanim = 0;
         } 

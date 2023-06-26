@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System;
+using System.Reflection;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -17,24 +19,45 @@ public class ButtonFocus : MonoBehaviour
     public GameObject ColorButton;
     public GameObject TextButton;
 
+    [Header("Type Button")]
+    public bool smallButton;
+    public bool setAudio;
+    [HideInInspector]
+    public GameObject audioObject;
 
     [Header("Setting Button")]
-    public bool smallButton;
+    public bool close;
+    [HideInInspector]
+    public GameObject closeTrigger;
+
     public bool ForSceneManager;
-    public bool ForGameObject;
-    public bool ForQuitButton;
-    public bool resetButton;
-
-    /// <summary>
-    /// ButtonFocus dont have back button if want back button call script Fade
-    /// </summary>
-
     [HideInInspector]
     public int NumberScene;
     [HideInInspector]
+    public bool setTransition;
+    [HideInInspector]
+    public GameObject playTrasition;
+    [HideInInspector]
+    public RuntimeAnimatorController newController;
+    //public Animator
+
+    public bool ForGameObject;
+    [HideInInspector]
     public GameObject ActiveGameObject;
 
+    public bool ForQuitButton;
+    public bool resetButton;
 
+
+
+
+
+
+    void Start()
+    {
+
+
+    }
     void Update()
     {
       
@@ -68,14 +91,37 @@ public class ButtonFocus : MonoBehaviour
             ColorButton.GetComponent<Image>().rectTransform.anchoredPosition = new Vector2(0.13f, 2);
             TextButton.GetComponent<TMPro.TextMeshProUGUI>().rectTransform.anchoredPosition = new Vector2(0.19f, 0);
         }
-        yield return new WaitForSeconds(0.2f);
-        if (ForSceneManager) 
-            SceneManager.LoadScene(NumberScene);
+        yield return new WaitForSecondsRealtime(0.2f);
+
         if (ForGameObject) 
             ActiveGameObject.SetActive(value);
-        if (ForQuitButton) {
-            Application.Quit();
-            Debug.Log("Quit Games");
+    
+        if ((ForQuitButton || ForSceneManager) && setTransition) {
+            playTrasition.GetComponent<Animator>().runtimeAnimatorController = newController;
+
+            yield return new WaitForSecondsRealtime(playTrasition.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length);
+            if (ForQuitButton)
+            {
+                Application.Quit();
+                Debug.Log("Quit Games");
+            }
+            if (ForSceneManager)
+                SceneManager.LoadScene(NumberScene);
+        }
+
+        if (resetButton)
+        {
+            foreach (PlayerData playerData in Enum.GetValues(typeof(PlayerData)))
+            {
+                PlayerPrefs.SetInt(playerData.ToString(), 0);
+            }
+        }
+        if (close) {
+            closeTrigger.SetActive(false);
+        }
+
+        if (setAudio) {
+            audioObject.GetComponent<AudioGame>().SoundButton();
         }
         yield return null;
 
@@ -106,16 +152,56 @@ public class RandomScript_Editor : Editor {
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector(); // for other non-HideInInspector fields
-
+        
+        
         ButtonFocus script = (ButtonFocus)target;
-        if (script.ForSceneManager == true) {
+
+
+
+
+        if (script.ForSceneManager == true)
+        {
             script.ForGameObject = false;
+            script.ForQuitButton = false;
+            script.resetButton = false;
             script.NumberScene = EditorGUILayout.IntField("Direct Scene Number", script.NumberScene);
+            script.setTransition = EditorGUILayout.Toggle("Add Animation transition", script.setTransition);
+            if (script.setTransition)
+            {
+                script.playTrasition = EditorGUILayout.ObjectField("Transition Animation", script.playTrasition, typeof(GameObject), true) as GameObject;
+                script.newController = EditorGUILayout.ObjectField("Controller reverse", script.newController, typeof(RuntimeAnimatorController), true) as RuntimeAnimatorController;
+            }
         }
-            
-        if (script.ForGameObject == true) {
+
+        if (script.ForGameObject == true)
+        {
             script.ForSceneManager = false;
-            script.ActiveGameObject = EditorGUILayout.ObjectField("Active Object", script.ActiveGameObject, typeof(GameObject), true) as GameObject;
+            script.ForQuitButton = false;
+            script.resetButton = false;
+            script.ActiveGameObject = EditorGUILayout.ObjectField("Game Object For Panel", script.ActiveGameObject, typeof(GameObject), true) as GameObject;
+        }
+        if (script.ForQuitButton == true)
+        {
+            script.ForSceneManager = false;
+            script.ForGameObject = false;
+            script.resetButton = false;
+            script.setTransition = EditorGUILayout.Toggle("Add Animation transition", script.setTransition);
+            if (script.setTransition) {
+                script.playTrasition = EditorGUILayout.ObjectField("Transition Animation", script.playTrasition, typeof(GameObject), true) as GameObject;
+                script.newController = EditorGUILayout.ObjectField("Controller reverse", script.newController, typeof(RuntimeAnimatorController), true) as RuntimeAnimatorController;
+            }
+        }
+        if (script.resetButton == true)
+        {
+            script.ForGameObject = false;
+            script.ForQuitButton = false;
+            script.ForSceneManager = false;
+        }
+        if (script.close) {
+            script.closeTrigger = EditorGUILayout.ObjectField("trigger zoom out", script.closeTrigger, typeof(GameObject), true) as GameObject;
+        }
+        if (script.setAudio) {
+            script.audioObject = EditorGUILayout.ObjectField("Add Audio Game Object", script.audioObject, typeof(GameObject), true) as GameObject;
         }
 
     }
