@@ -21,7 +21,7 @@ public class Tetrimino : MonoBehaviour
     public static bool movedImmediateHorizontal = false;
     public static bool movedImmediateVertical = false;
 
-   
+    ButtonFocus inputButton;
 
     void Start()
     {
@@ -69,32 +69,32 @@ public class Tetrimino : MonoBehaviour
         //- Left and right will move the tetromino one unit to the or right
         //- Down will move the tetromino 1 unit down
         //- Up will rotate the tetromino
-        if (Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow) )
+        if (Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow ) || ButtonFocus.leftrightUp  )
         {
             movedImmediateHorizontal = false;
             horizontalTimer = 0;
             buttonDownWaitTimerHorizontal = 0;
             
         }
-        if (Input.GetKeyUp(KeyCode.DownArrow)) {
+        if (Input.GetKeyUp(KeyCode.DownArrow) || ButtonFocus.downUp) {
             movedImmediateVertical = false;
             
             verticalTimer = 0;
             buttonDownWaitTimeVertical =0;
         }
-        if (Input.GetKey(KeyCode.RightArrow) || Game.MoveRight)
+        if (Input.GetKey(KeyCode.RightArrow) || ButtonFocus.right)
         {
             MoveRight();
         }
-        else if (Input.GetKey(KeyCode.LeftArrow) || Game.MoveLeft)
+        else if (Input.GetKey(KeyCode.LeftArrow) || ButtonFocus.left)
         {
             MoveLeft();
         }
-        if (Input.GetKeyDown(KeyCode.UpArrow) || Game.MoveRotate)
+        if (Input.GetKeyDown(KeyCode.UpArrow) || ButtonFocus.rotation)
         {
             Rotate();
         }
-        if (Input.GetKey(KeyCode.DownArrow)  || Time.time - fall >= fallSpeed || (Game.MoveDown))
+        if (Input.GetKey(KeyCode.DownArrow)  || Time.time - fall >= fallSpeed || ButtonFocus.down)
         {
             MoveDown();
         }
@@ -102,7 +102,7 @@ public class Tetrimino : MonoBehaviour
 
     void MoveLeft()
     {
-        if (movedImmediateHorizontal)
+        if (movedImmediateHorizontal )
         {
             if (buttonDownWaitTimerHorizontal < buttonDownWaitMax)
             {
@@ -115,8 +115,11 @@ public class Tetrimino : MonoBehaviour
                 return;
             }
         }
-        if (!movedImmediateHorizontal)
+        if (!movedImmediateHorizontal )
+        {
+            ButtonFocus.leftrightUp = false;
             movedImmediateHorizontal = true;
+        }
         horizontalTimer = 0;
         transform.position += new Vector3(-1, 0, 0);
 
@@ -128,12 +131,12 @@ public class Tetrimino : MonoBehaviour
         else
         {
             transform.position += new Vector3(1, 0, 0);
-            Game.MoveLeft = false;
+            ButtonFocus.left = false;
         }
     }
     void MoveRight()
     {
-        if (movedImmediateHorizontal)
+        if (movedImmediateHorizontal )
         {
             if (buttonDownWaitTimerHorizontal < buttonDownWaitMax)
             {
@@ -147,7 +150,10 @@ public class Tetrimino : MonoBehaviour
             }
         }
         if (!movedImmediateHorizontal)
+        {
             movedImmediateHorizontal = true;
+            ButtonFocus.leftrightUp = false;
+        }
         horizontalTimer = 0;
         //- Fisrt we attempt to move the tetramino to the right
         transform.position += new Vector3(1, 0, 0);
@@ -163,7 +169,7 @@ public class Tetrimino : MonoBehaviour
         {
             //- if it isn't we move the tetromino back to the left
             transform.position += new Vector3(-1, 0, 0);
-            Game.MoveRight = false;
+            ButtonFocus.right = false;
         }
     }
     IEnumerator Blink()
@@ -185,7 +191,7 @@ public class Tetrimino : MonoBehaviour
     }
     void MoveDown()
     {
-        if (movedImmediateVertical)
+        if (movedImmediateVertical )
         {
             if (buttonDownWaitTimeVertical < buttonDownWaitMax)
             {
@@ -201,7 +207,10 @@ public class Tetrimino : MonoBehaviour
             }
         }
         if (!movedImmediateVertical)
+        {
             movedImmediateVertical = true;
+            ButtonFocus.downUp = false;
+        }
         verticalTimer = 0;
         transform.position += new Vector3(0, -1, 0);
 
@@ -210,7 +219,7 @@ public class Tetrimino : MonoBehaviour
         {
             FindObjectOfType<Game>().UpdateGrid(this);
 
-            if (Input.GetKey(KeyCode.DownArrow) || Game.MoveDown)
+            if (Input.GetKey(KeyCode.DownArrow) || ButtonFocus.down)
             {
                 FindObjectOfType<AudioGame>().PlayMoveAudio();
             }
@@ -245,7 +254,7 @@ public class Tetrimino : MonoBehaviour
             //FindObjectOfType<AudioGame>().PlayLandAudio();
 
             //Game.currentScore += individualScore;
-            
+            ButtonFocus.swap = false;
             enabled = false;
             tag = "Untagged";
         }
@@ -260,7 +269,7 @@ public class Tetrimino : MonoBehaviour
             {
 
 
-                Game.MoveRotate = false;
+                ButtonFocus.rotation = false;
                 if (limitRotation)
                 {
                     if (transform.rotation.eulerAngles.z >= 90)
@@ -304,7 +313,7 @@ public class Tetrimino : MonoBehaviour
         }
         else
         {
-            Game.MoveRotate = false;
+            ButtonFocus.rotation = false;
         }
     }
 

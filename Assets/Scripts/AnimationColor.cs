@@ -12,9 +12,6 @@ public class AnimationColor : MonoBehaviour
         backgroundColor = GetComponent<Image>();
         backgroundColor.color = new Color32(255, 0, 0 , 255);
 
-
-
-
     }
 
     void Update()
@@ -73,14 +70,7 @@ public class AnimationColor : MonoBehaviour
         yield return null;
     }
 
-    byte maxValue() {
-        for (int i = 0; i < 255 + 1; i++)
-        {
-            return (byte)i;
-        }
-        return 0;
 
-    }
     void ChangeColor(byte red , byte green , byte blue ) {
         backgroundColor.GetComponent<Image>().color = new Color32(red, green, blue, 255);
     }

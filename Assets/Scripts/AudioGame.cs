@@ -39,18 +39,30 @@ public class AudioGame : MonoBehaviour
 
     private AudioSource audioSource;
 
+    public int defaulVolumeAudio= 2;
 
     // Start is called before the first frame update
     void Start()
     {
+        Checkifnull();
         audioSource = GetComponent<AudioSource>();
         MusicPlayedBg();
         
     }
 
 
+    void Checkifnull()
+    {
+        if (PlayerPrefs.GetInt(PlayerData.SettingsMusic.ToString()) == 0)
+        {
+            PlayerPrefs.SetInt(PlayerData.SettingsMusic.ToString(), defaulVolumeAudio);
+        }
 
-
+        if (PlayerPrefs.GetInt(PlayerData.SettingsSoundEffect.ToString()) == 0)
+        {
+            PlayerPrefs.SetInt(PlayerData.SettingsSoundEffect.ToString(), defaulVolumeAudio);
+        }
+    }
     public bool CheckSettingsMusic()
     {
         if (PlayerPrefs.GetInt(PlayerData.SettingsMusic.ToString()) == 2)
@@ -127,13 +139,13 @@ public class EditorAudioGame : Editor {
         {
             audioGame.buttonAudio = EditorGUILayout.ObjectField("Audio Button", audioGame.buttonAudio, typeof(AudioClip), true) as AudioClip;
             audioGame.mainAudio = EditorGUILayout.ObjectField("Audio Backsound", audioGame.mainAudio, typeof(AudioClip), true) as AudioClip;
-            audioGame.scoreAudio = EditorGUILayout.ObjectField("Audio Point", audioGame.mainAudio, typeof(AudioClip), true) as AudioClip;
+            audioGame.scoreAudio = EditorGUILayout.ObjectField("Audio Point", audioGame.scoreAudio, typeof(AudioClip), true) as AudioClip;
         }
         if (audioGame.setGameAudio) {
-            audioGame.MoveSound = EditorGUILayout.ObjectField("Audio Button", audioGame.buttonAudio, typeof(AudioClip), true) as AudioClip;
-            audioGame.rowSound = EditorGUILayout.ObjectField("Audio Button", audioGame.buttonAudio, typeof(AudioClip), true) as AudioClip;
-            audioGame.swapSound = EditorGUILayout.ObjectField("Audio Button", audioGame.buttonAudio, typeof(AudioClip), true) as AudioClip;
-            audioGame.rotatioSound = EditorGUILayout.ObjectField("Audio Button", audioGame.buttonAudio, typeof(AudioClip), true) as AudioClip;
+            audioGame.MoveSound = EditorGUILayout.ObjectField("Audio Move Button", audioGame.buttonAudio, typeof(AudioClip), true) as AudioClip;
+            audioGame.rowSound = EditorGUILayout.ObjectField("Audio row Button", audioGame.buttonAudio, typeof(AudioClip), true) as AudioClip;
+            audioGame.swapSound = EditorGUILayout.ObjectField("Audio swap Button", audioGame.buttonAudio, typeof(AudioClip), true) as AudioClip;
+            audioGame.rotatioSound = EditorGUILayout.ObjectField("Audio rotation Button", audioGame.buttonAudio, typeof(AudioClip), true) as AudioClip;
 
         }
 

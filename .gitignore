@@ -1,5 +1,6 @@
 .vs
 .vscode
+tes_BurstDebugInformation_DoNotShip/
 Library/
 Logs/
 obj/

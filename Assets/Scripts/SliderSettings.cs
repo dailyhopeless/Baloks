@@ -12,6 +12,8 @@ public class SliderSettings : MonoBehaviour
     [Header("Settings Slider")]
     public bool longSlider;
     public bool toggleSlider;
+
+    public bool setMusicSettings;
     public PlayerData saveData;
 
     [Header("Default Number")]
@@ -27,13 +29,15 @@ public class SliderSettings : MonoBehaviour
     public GameObject ifDisable;
     [HideInInspector]
     public GameObject haddle;
+    [HideInInspector]
+    public GameObject MusicObject;
 
     private Slider slider;
 
 
     void Start()
     {
-        Checkifnull();
+       // Checkifnull();
         slider = GetComponent<Slider>();
         slider.onValueChanged.AddListener(delegate { ValueChangeCheck(); });
         slider.value = PlayerPrefs.GetInt(saveData.ToString());
@@ -44,16 +48,25 @@ public class SliderSettings : MonoBehaviour
     }
 
     void UpdaateSlider() {
-        if (PlayerPrefs.GetInt(saveData.ToString()) == 0) {
-            if (longSlider)
+        if (PlayerPrefs.GetInt(saveData.ToString()) == 0)
+        {
+            {
+                if (longSlider) { }
                 slider.value = setSliderLong;
+                PlayerPrefs.SetInt(saveData.ToString(), setSliderLong);
+            }
+
             if (toggleSlider)
+            {
                 slider.value = setSlidertoggle;
+                PlayerPrefs.SetInt(saveData.ToString(), setSlidertoggle);
+            }
         }
+        
     }
     public void ValueChangeCheck()
     {
-        Checkifnull();
+        UpdaateSlider();
         PlayerPrefs.SetInt(saveData.ToString(), (int)slider.value);
         if(longSlider)
             countSpeedText.text = Mathf.Floor(slider.value).ToString();
@@ -64,13 +77,22 @@ public class SliderSettings : MonoBehaviour
             {
                 ifDisable.SetActive(true);
                 haddle.GetComponent<Image>().color = new Color32(204, 10, 10, 255);
+                if (setMusicSettings)
+                {
+                    MusicObject.GetComponent<AudioSource>().Stop();
+                }
             }
             else {
                 ifDisable.SetActive(false);
                 haddle.GetComponent<Image>().color = new Color32(9, 209, 13, 255);
+                if (setMusicSettings)
+                {
+                    MusicObject.GetComponent<AudioSource>().Play();
+                }
             }
                
         }
+      
     }
     /// <summary>
     /// below for button handdle
@@ -80,26 +102,6 @@ public class SliderSettings : MonoBehaviour
             slider.value = 2;
         else
             slider.value = 1; 
-    }
-
-
-    void Checkifnull() {
-        if (toggleSlider)
-        {
-            if (PlayerPrefs.GetInt(saveData.ToString()) == 0)
-            {
-                PlayerPrefs.SetInt(saveData.ToString(), setSlidertoggle);
-
-            }
-        }
-        else if (longSlider) {
-            if (PlayerPrefs.GetInt(saveData.ToString()) == 0) 
-            {
-                PlayerPrefs.SetInt(saveData.ToString(), setSliderLong);
-                
-            }
-        }
-        
     }
 
 }
@@ -123,7 +125,10 @@ public class SliderSettingsEditor : Editor {
             slider.longSlider = false;
             slider.ifDisable = EditorGUILayout.ObjectField("Change Color Disable", slider.ifDisable, typeof(GameObject), true) as GameObject;
             slider.haddle = EditorGUILayout.ObjectField("Handle Slider", slider.haddle, typeof(GameObject), true) as GameObject;
-        }    
+        }
+        if (slider.setMusicSettings == true) {
+            slider.MusicObject = EditorGUILayout.ObjectField("Music Object Setting", slider.MusicObject, typeof(GameObject), true) as GameObject;
+        }
     }
 }
 #endif

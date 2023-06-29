@@ -13,7 +13,7 @@ public class Game : MonoBehaviour
     public static Transform[,] grid = new Transform[gridWidth, gridHeight];
 
     public static int AddSpeedFall;
-    public static bool MoveRight, MoveLeft, MoveDown, MoveRotate = false;
+    //public static bool MoveRight, MoveLeft, MoveDown, MoveRotate = false;
    
     public int scoreOneLine = 5;
     public int scoreTwoLine = 10;
@@ -91,15 +91,16 @@ public class Game : MonoBehaviour
         //        UnPauseButton();
         //    }
         //}
-        if (Input.GetKeyUp(KeyCode.Space)) {
+        if (Input.GetKeyUp(KeyCode.Space) || ButtonFocus.swap) {
             GameObject tempNexTetromino = GameObject.FindGameObjectWithTag("currentActiveTetromino");
             SaveTetromino(tempNexTetromino.transform);
+           
         }
     }
-    public void SwapButton() {
-        GameObject tempNexTetromino = GameObject.FindGameObjectWithTag("currentActiveTetromino");
-        SaveTetromino(tempNexTetromino.transform);
-    }
+    //public void SwapButton() {
+    //    GameObject tempNexTetromino = GameObject.FindGameObjectWithTag("currentActiveTetromino");
+    //    SaveTetromino(tempNexTetromino.transform);
+    //}
 
 
     void StartingGame() {
@@ -559,32 +560,32 @@ public class Game : MonoBehaviour
         return randomTetrominoName;
     }
 
-    public void MoveRightButton () {
-       MoveRight = true;
-    }
-    public void MoveRightButtonUp () {
-       MoveRight = false;
-       Tetrimino.movedImmediateHorizontal = false;
-    }
-    public void MoveLeftButton(){
-        MoveLeft = true;
-    }
-    public void MoveLeftButtonUp(){
-        MoveLeft = false;
-        Tetrimino.movedImmediateHorizontal = false;
-    }
-    public void MoveDownButton() {
-        MoveDown = true;
+    //public void MoveRightButton () {
+    //   MoveRight = true;
+    //}
+    //public void MoveRightButtonUp () {
+    //   MoveRight = false;
+    //    Tetrimino.movedImmediateHorizontal = false;
+    //}
+    //public void MoveLeftButton(){
+    //    MoveLeft = true;
+    //}
+    //public void MoveLeftButtonUp(){
+    //    MoveLeft = false;
+    //    Tetrimino.movedImmediateHorizontal = false;
+    //}
+    //public void MoveDownButton() {
+    //    MoveDown = true;
        
-    }
-    public void MoveDownButtonUp() {
-        MoveDown = false;
+    //}
+    //public void MoveDownButtonUp() {
+    //    MoveDown = false;
       
-        Tetrimino.movedImmediateVertical = false;
-    }
-    public void MoveRotateButton(){
-        MoveRotate = true;
-    }
+    //    Tetrimino.movedImmediateVertical = false;
+    //}
+    //public void MoveRotateButton(){
+    //    MoveRotate = true;
+    //}
     public void RestartButton () {
         SceneManager.LoadScene("Level");
         
