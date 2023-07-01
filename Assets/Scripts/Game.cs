@@ -1,34 +1,40 @@
-using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Game : MonoBehaviour
 {
-    
-    public static int gridWidth =  10;
+
+    public static int gridWidth = 10;
     public static int gridHeight = 25;
 
     public static Transform[,] grid = new Transform[gridWidth, gridHeight];
 
     public static int AddSpeedFall;
     //public static bool MoveRight, MoveLeft, MoveDown, MoveRotate = false;
-   
+
     public int scoreOneLine = 5;
     public int scoreTwoLine = 10;
     public int scoreThreeLine = 20;
     public int scoreFourLine = 50;
 
-    public static int currentLevel ;
-    public static int customLevel ;
+    public static int currentLevel;
+    public static int customLevel;
     public static int numLinesCleared = 0;
 
     public static float fallSpeed = 1.0f;
     public float maxSpeedFall = 9;
-    
+
     public Slider SliderSpeed;
-    public Text hud_score, hud_level, hud_lines, AddSpeedSlide, GameOver_score, highScoreText;
+    public TextMeshProUGUI AddSpeedSlide;
+
+    public Text GameOver_score;
+
+    public TextMeshProUGUI scoreUi;
+    public TextMeshProUGUI HighScoreUi;
+    public TextMeshProUGUI LevelUi;
+    public TextMeshProUGUI LinesUi;
 
     public static int numberOfRowsThisTurn = 0;
     public static int currentScore = 0;
@@ -41,236 +47,234 @@ public class Game : MonoBehaviour
     private bool gameStarted = false;
 
     public static Vector2 positionMino = new Vector2(5.0f, 25.0f);
-    private Vector2 previewTetrominoPosition = new Vector2 (-2.5f, 20);
-    private Vector2 savedTetrominoPosition = new Vector2(-2.5f, 8);
+    private Vector2 previewTetrominoPosition = new Vector2(-1.7f, 11.64f);
+    private Vector2 savedTetrominoPosition = new Vector2(-1.7f, 8.4f);
 
-    public static int startingHighScore ;
+    public static int startingHighScore;
 
     private float animScore;
     private float animHighScore;
     private float updateAnimValueHighScore;
-    public float speedcount = 2.0f;
+    //public float speedcount = 2.0f;
 
     public int maxSwaps = 2;
     private int currentSwaps = 1;
 
-    public static bool gameover ;
+    public static bool gameover;
 
 
     public static int tempScore;
 
+    [Header("Game Over")]
+    public GameObject gameOverPanel;
+    public AudioSource Audio;
+
+    float lines;
 
     void Start()
     {
         StartingGame();
-        SpawnNextTetromino ();
-        TempHighScore();
+        SpawnNextTetromino();
+
 
         //UnPauseButton();
-        Time.timeScale = 1;
+        //Time.timeScale = 1;
 
 
     }
-    void Update() {
-        UpdateScore();
+    void Update()
+    {
+        if (!(currentScore > 99999))
+            UpdateScore();
         UpdateUI();
-        DetectSound();
         UpdateLevel(numLinesCleared);
         UpdateSpeed(PlayerPrefs.GetInt(PlayerData.speedsettings.ToString()));
         UpdateNewHighScore();
         CheckUserInput();
-     
+
     }
 
-    void CheckUserInput () {
-        
-        //if(Input.GetKeyUp(KeyCode.P)) {
-        //    if (Time.timeScale == 1){
-        //        PauseButton();
-        //    } else {
-        //        UnPauseButton();
-        //    }
-        //}
-        if (Input.GetKeyUp(KeyCode.Space) || ButtonFocus.swap) {
+    void CheckUserInput()
+    {
+
+        if (Input.GetKeyUp(KeyCode.Space) || ButtonFocus.swap)
+        {
             GameObject tempNexTetromino = GameObject.FindGameObjectWithTag("currentActiveTetromino");
             SaveTetromino(tempNexTetromino.transform);
-           
         }
     }
-    //public void SwapButton() {
-    //    GameObject tempNexTetromino = GameObject.FindGameObjectWithTag("currentActiveTetromino");
-    //    SaveTetromino(tempNexTetromino.transform);
-    //}
 
 
-    void StartingGame() {
+    void StartingGame()
+    {
         currentScore = 0;
-        hud_score.text = "0" ;
-        SliderSpeed.maxValue = maxSpeedFall;
+        scoreUi.text = "0";
+        //SliderSpeed.maxValue = maxSpeedFall;
         SliderSpeed.value = PlayerPrefs.GetInt("speedsettings");
         startingHighScore = PlayerPrefs.GetInt("highscore");
-        highScoreText.text = startingHighScore.ToString();
-    
-    }
-    public void UpdateHighScore (){
-        if (currentScore > startingHighScore) {
-            PlayerPrefs.SetInt("highscore", currentScore); 
-        }
-    }
-    public void TempHighScore()
-    {
-        if (!gameover)
-        {
-           PlayerPrefs.SetInt("tempscore", startingHighScore);
-        }
+        HighScoreUi.text = startingHighScore.ToString();
+        numLinesCleared = 0;
+        Pause.isPaused = false;
+        customLevel = 1;
+        PlayerPrefs.SetInt("tempscore", startingHighScore);
         tempScore = PlayerPrefs.GetInt("tempscore");
+
+    }
+    public void UpdateHighScore()
+    {
+        if (currentScore > startingHighScore)
+        {
+            PlayerPrefs.SetInt("highscore", currentScore);
+        }
     }
 
-    private int AnimCountScore()
+    private int AnimCountScore(int value, float fast)
     {
-        if (animScore < currentScore)
+        if (animScore <= value)
         {
-            animScore += (fallSpeed * Time.deltaTime) * speedcount;
+            animScore += (fast * Time.deltaTime);
             return (int)Mathf.Floor(animScore);
         }
-        return  currentScore;
+        return value;
     }
 
     public void UpdateUI()
     {
-        //GameOver_score.text = currentScore.ToString();
-        hud_score.text = AnimCountScore().ToString();
-        hud_level.text = currentLevel.ToString();
-        hud_lines.text = numLinesCleared.ToString();
+        scoreUi.text = AnimCountScore(currentScore, scoreFourLine).ToString();
+        LevelUi.text = currentLevel.ToString();
+        //lines = numLinesCleared;
+
+        if (lines <= numLinesCleared)
+        {
+            lines += (4 * Time.deltaTime);
+        }
+        LinesUi.text = ((int)Mathf.Floor(lines)).ToString();
         SliderSpeed.minValue = currentLevel;
     }
-    
-    void UpdateNewHighScore() {
-        if (startingHighScore < currentScore && AnimCountScore() == currentScore)
+
+    void UpdateNewHighScore()
+    {
+        if (startingHighScore < currentScore && AnimCountScore(currentScore, scoreFourLine) == currentScore)
         {
             if (startingHighScore == 0)
             {
-              
+
                 if (animHighScore < currentScore)
                 {
-                    animHighScore += (fallSpeed * Time.deltaTime) * 30;
+                    animHighScore += (1 * Time.deltaTime) * 30;
                 }
-                highScoreText.text = Mathf.Floor(animHighScore).ToString();
+                HighScoreUi.text = Mathf.Floor(animHighScore).ToString();
             }
-            else {
+            else
+            {
                 //animHighScore + startingHighScore;
-                
+
                 if (animHighScore < (currentScore - startingHighScore))
                 {
-                    
-                    animHighScore  += (fallSpeed * Time.deltaTime) * 30;
-                    updateAnimValueHighScore = startingHighScore + Mathf.Floor(animHighScore)  ;
+
+                    animHighScore += (1 * Time.deltaTime) * 30;
+                    updateAnimValueHighScore = startingHighScore + Mathf.Floor(animHighScore);
                 }
-                
-                highScoreText.text = updateAnimValueHighScore.ToString();
+
+                HighScoreUi.text = updateAnimValueHighScore.ToString();
             }
-            
+
 
         }
     }
-    public void UpdateLevel(int value) {
-        currentLevel = customLevel ;
-        if (value >= (customLevel * 10))  {
-            customLevel = (value / 10 ) + 1 ;  
+    public void UpdateLevel(int value)
+    {
+        currentLevel = customLevel;
+        if (value >= (customLevel * 10))
+        {
+            customLevel = (value / 10) + 1;
         }
         return;
     }
-    public void SaveSetting(int value){
-       PlayerPrefs.SetInt("speedsettings", value);
+    public void SaveSetting(int value)
+    {
+        PlayerPrefs.SetInt("speedsettings", value);
     }
 
-    void UpdateSpeed(int value) {
-      
-        if (value > currentLevel ) {
-           
-            fallSpeed = 1.0f - (value * 0.1f );
-        } else {
+    void UpdateSpeed(int value)
+    {
+
+        if (value > currentLevel)
+        {
+
+            fallSpeed = 1.0f - (value * 0.1f);
+        }
+        else
+        {
             fallSpeed = 1.0f - (currentLevel * 0.1f);
-            if (maxSpeedFall < currentLevel){
+            if (maxSpeedFall < currentLevel)
+            {
                 fallSpeed = 1.0f - (maxSpeedFall * 0.1f);
             }
         }
 
     }
-    public void ChangedValue (float value){
-        AddSpeedFall = (int)value ;
-        
+    public void ChangedValue(float value)
+    {
+        AddSpeedFall = (int)value;
+
         AddSpeedSlide.text = value.ToString();
-       
+
     }
 
-    public int rowsoundanim = 0;
-    public void DetectSound() {
-       
-        if (rowsoundanim > 0)
+    public void UpdateScore()
+    {
+        if (numberOfRowsThisTurn > 0)
         {
-            
-            if (rowsoundanim == 1)
+            if (numberOfRowsThisTurn == 1)
             {
-                FindObjectOfType<AudioGame>().PlayLineClearedSound();
-            }
-            else if (rowsoundanim == 2)
-            {
-                
-                FindObjectOfType<AudioGame>().PlayLineClearedSound();
-            }
-            else if (rowsoundanim == 3)
-            {
-                FindObjectOfType<AudioGame>().PlayLineClearedSound();
-            }
-            else if (rowsoundanim == 4) {
-                //FindObjectOfType<AudioGame>().PlayLineClearedSoundHight();
-            }
-            rowsoundanim = 0;
-        } 
-        
-    }
-   
-    public void UpdateScore () {
-        if (numberOfRowsThisTurn > 0 ){
-            if (numberOfRowsThisTurn == 1){
                 ClearedOneLine();
-            }else if (numberOfRowsThisTurn ==2){
+            }
+            else if (numberOfRowsThisTurn == 2)
+            {
                 ClearedTwoLines();
-            }else if (numberOfRowsThisTurn == 3){
+            }
+            else if (numberOfRowsThisTurn == 3)
+            {
                 ClearedThreeLines();
-            }else if (numberOfRowsThisTurn == 4){
+            }
+            else if (numberOfRowsThisTurn == 4)
+            {
                 ClearedFourLines();
             }
             numberOfRowsThisTurn = 0;
         }
     }
 
-    public void ClearedOneLine () {
-        currentScore += scoreOneLine  + (currentLevel * 5);
-        numLinesCleared ++;
-        
+    public void ClearedOneLine()
+    {
+        currentScore += scoreOneLine + (currentLevel * 5);
+        numLinesCleared++;
+
     }
-    public void ClearedTwoLines() {
+    public void ClearedTwoLines()
+    {
         currentScore += scoreTwoLine + (currentLevel * 10);
         numLinesCleared += 2;
-        
-
     }
-    public void ClearedThreeLines() {
+    public void ClearedThreeLines()
+    {
         currentScore += scoreThreeLine + (currentLevel * 20);
         numLinesCleared += 3;
-   
+
     }
-    public void ClearedFourLines() {
+    public void ClearedFourLines()
+    {
         currentScore += scoreFourLine + (currentLevel * 30);
         numLinesCleared += 4;
-       
+
     }
 
 
-    bool CheckIsValidPosition(GameObject tetromino) {
-        foreach (Transform mino in tetromino.transform) {
+    bool CheckIsValidPosition(GameObject tetromino)
+    {
+        foreach (Transform mino in tetromino.transform)
+        {
             Vector2 pos = Round(mino.position);
             if (!CheckIsInsideGrid(pos))
                 return false;
@@ -279,11 +283,15 @@ public class Game : MonoBehaviour
         }
         return true;
     }
-    public bool CheckIsAboveGrid (Tetrimino tetrimino) {
-        for (int x = 0; x < gridWidth; ++x ) {
-            foreach (Transform mino in tetrimino.transform){
-                Vector2 pos = Round (mino.position);
-                if (pos.y > gridHeight - 1){
+    public bool CheckIsAboveGrid(Tetrimino tetrimino)
+    {
+        for (int x = 0; x < gridWidth; ++x)
+        {
+            foreach (Transform mino in tetrimino.transform)
+            {
+                Vector2 pos = Round(mino.position);
+                if (pos.y > gridHeight - 1)
+                {
                     return true;
                 }
             }
@@ -291,11 +299,14 @@ public class Game : MonoBehaviour
         return false;
     }
 
-    public bool IsFullRowAt (int y ){
+    public bool IsFullRowAt(int y)
+    {
         // - The parameter y, is the row we will interate over in the grid array to check each x position for a transform.
-        for (int x = 0; x < gridWidth; ++x) {
+        for (int x = 0; x < gridWidth; ++x)
+        {
             // - If we find a position that return NULL instead of a tranform, then we know that the row is not full.
-            if (grid [x, y] == null) {
+            if (grid[x, y] == null)
+            {
                 // - so we return false
                 return false;
             }
@@ -316,11 +327,12 @@ public class Game : MonoBehaviour
                 return false;
             }
         }
-        rowsoundanim++;
+        // rowsoundanim++;
         return true;
     }
 
-    public void FullAnimatehide() {
+    public void FullAnimatehide()
+    {
         for (int y = 0; y < gridHeight; ++y)
         {
             if (IsFullRowAtanim(y))
@@ -348,7 +360,7 @@ public class Game : MonoBehaviour
         {
             if (IsFullRowAtanim(y))
             {
-           
+
                 AnimateColorshow(y);
             }
         }
@@ -368,110 +380,136 @@ public class Game : MonoBehaviour
             Game.grid[x, y].gameObject.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0);
         }
     }
-    public void DeleteMinoAt (int y ) {
+    public void DeleteMinoAt(int y)
+    {
         for (int x = 0; x < gridWidth; ++x)
         {
             Destroy(grid[x, y].gameObject);
-            grid[x,y] = null;
+            grid[x, y] = null;
         }
     }
-    public void MoveRowDown (int y ) {
-        for (int x = 0; x < gridWidth; ++x) {
-            if (grid[x,y] != null) {
-                grid[x,y -1] = grid[x,y];
-                grid[x, y ] = null;
-                grid [x, y-1].position += new Vector3(0, -1, 0);
+    public void MoveRowDown(int y)
+    {
+        for (int x = 0; x < gridWidth; ++x)
+        {
+            if (grid[x, y] != null)
+            {
+                grid[x, y - 1] = grid[x, y];
+                grid[x, y] = null;
+                grid[x, y - 1].position += new Vector3(0, -1, 0);
             }
         }
 
     }
-    public void MoveAllRowsDown (int y) {
-        for (int i = y; i < gridHeight; ++i ){
+    public void MoveAllRowsDown(int y)
+    {
+        for (int i = y; i < gridHeight; ++i)
+        {
             MoveRowDown(i);
             --y;
         }
     }
 
-    public void DeleteRow () {
-        for (int y = 0; y < gridHeight; ++y) {
-            if (IsFullRowAt(y)){
+    public void DeleteRow()
+    {
+        for (int y = 0; y < gridHeight; ++y)
+        {
+            if (IsFullRowAt(y))
+            {
                 //AnimationRow(y);
                 //StartCoroutine(Blink(2f, y));
                 DeleteMinoAt(y);
-                MoveAllRowsDown (y + 1);
+                MoveAllRowsDown(y + 1);
                 --y;
             }
         }
     }
-    public void UpdateGrid (Tetrimino tetrimino){
-        for (int y = 0; y < gridHeight; ++y){
-            for (int x= 0; x < gridWidth; ++ x){
-                if (grid[x, y] != null){
-                    if (grid[x,y].parent == tetrimino.transform){
-                        grid[x,y] = null;
+    public void UpdateGrid(Tetrimino tetrimino)
+    {
+        for (int y = 0; y < gridHeight; ++y)
+        {
+            for (int x = 0; x < gridWidth; ++x)
+            {
+                if (grid[x, y] != null)
+                {
+                    if (grid[x, y].parent == tetrimino.transform)
+                    {
+                        grid[x, y] = null;
                     }
                 }
             }
         }
-        foreach (Transform mino in tetrimino.transform){
-            Vector2 pos = Round (mino.position);
-            if (pos.y < gridHeight) {
-                grid [(int)pos.x, (int)pos.y] = mino;
+        foreach (Transform mino in tetrimino.transform)
+        {
+            Vector2 pos = Round(mino.position);
+            if (pos.y < gridHeight)
+            {
+                grid[(int)pos.x, (int)pos.y] = mino;
             }
         }
     }
 
-    public Transform GetTransformAtGridPosition (Vector2 pos) {
-        if (pos.y > gridHeight -1){
+    public Transform GetTransformAtGridPosition(Vector2 pos)
+    {
+        if (pos.y > gridHeight - 1)
+        {
             return null;
-        } else {
-            return grid [(int)pos.x, (int)pos.y];
+        }
+        else
+        {
+            return grid[(int)pos.x, (int)pos.y];
         }
     }
 
 
-    public void SpawnNextTetromino () {
-        
-        if (!gameStarted){
+    public void SpawnNextTetromino()
+    {
+
+        if (!gameStarted)
+        {
             gameStarted = true;
-            nextTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), positionMino, Quaternion.identity );
+            nextTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), positionMino, Quaternion.identity);
             previewTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), previewTetrominoPosition, Quaternion.identity);
-            previewTetromino.GetComponent<Tetrimino>().enabled =false;
-            previewTetromino.transform.localScale =  new Vector3(0.6f, 0.6f, 1f);
+            previewTetromino.GetComponent<Tetrimino>().enabled = false;
+            previewTetromino.transform.localScale = new Vector3(0.3f, 0.3f, 1f);
             nextTetromino.tag = "currentActiveTetromino";
-      
+
             SpawnGhostTetromino();
 
-        }else {
-            previewTetromino.transform.localScale =  new Vector3(1f, 1f, 1f);
+        }
+        else
+        {
+            previewTetromino.transform.localScale = new Vector3(1f, 1f, 1f);
             previewTetromino.transform.localPosition = positionMino;
             nextTetromino = previewTetromino;
             nextTetromino.GetComponent<Tetrimino>().enabled = true;
             nextTetromino.tag = "currentActiveTetromino";
             previewTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), previewTetrominoPosition, Quaternion.identity);
-            
-            previewTetromino.GetComponent<Tetrimino>().enabled =false;
-            previewTetromino.transform.localScale =  new Vector3(0.6f, 0.6f, 1f);
 
-      
+            previewTetromino.GetComponent<Tetrimino>().enabled = false;
+            previewTetromino.transform.localScale = new Vector3(0.3f, 0.3f, 1f);
+
+
             SpawnGhostTetromino();
         }
         currentSwaps = 0;
-   
+
     }
 
 
 
-    public void SpawnGhostTetromino() {
-        if (GameObject.FindGameObjectWithTag ("currentGhostTetromino") != null)
+    public void SpawnGhostTetromino()
+    {
+        if (GameObject.FindGameObjectWithTag("currentGhostTetromino") != null)
             Destroy(GameObject.FindGameObjectWithTag("currentGhostTetromino"));
         ghosttetromino = (GameObject)Instantiate(nextTetromino, nextTetromino.transform.position, Quaternion.identity);
         Destroy(ghosttetromino.GetComponent<Tetrimino>());
         ghosttetromino.AddComponent<GhostTetromino>();
-        
+
     }
 
-    public void SaveTetromino(Transform t) {
+    public void SaveTetromino(Transform t)
+    {
         currentSwaps++;
         if (currentSwaps > maxSwaps)
             return;
@@ -481,16 +519,17 @@ public class Game : MonoBehaviour
 
             tempSavedTetromino.transform.localPosition = new Vector2(gridWidth / 2, gridHeight);
             tempSavedTetromino.transform.localScale = new Vector3(1f, 1f, 1f);
-            if (!CheckIsValidPosition(tempSavedTetromino)) {
+            if (!CheckIsValidPosition(tempSavedTetromino))
+            {
                 tempSavedTetromino.transform.localPosition = savedTetrominoPosition;
-                tempSavedTetromino.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
+                tempSavedTetromino.transform.localScale = new Vector3(0.3f, 0.3f, 1f);
                 return;
             }
             savedTetromno = (GameObject)Instantiate(t.gameObject);
             savedTetromno.GetComponent<Tetrimino>().enabled = false;
             savedTetromno.transform.localPosition = savedTetrominoPosition;
             savedTetromno.transform.localScale = new Vector3(1f, 1f, 1f);
-            savedTetromno.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
+            savedTetromno.transform.localScale = new Vector3(0.3f, 0.3f, 1f);
             savedTetromno.tag = "currentSaveTetromino";
 
             nextTetromino = (GameObject)Instantiate(tempSavedTetromino);
@@ -502,13 +541,14 @@ public class Game : MonoBehaviour
             DestroyImmediate(tempSavedTetromino);
 
             SpawnGhostTetromino();
-          
+
         }
-        else {
+        else
+        {
             savedTetromno = (GameObject)Instantiate(GameObject.FindGameObjectWithTag("currentActiveTetromino"));
             savedTetromno.GetComponent<Tetrimino>().enabled = false;
             savedTetromno.transform.localPosition = savedTetrominoPosition;
-            savedTetromno.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
+            savedTetromno.transform.localScale = new Vector3(0.3f, 0.3f, 1f);
             savedTetromno.tag = "currentSaveTetromino";
 
             DestroyImmediate(GameObject.FindGameObjectWithTag("currentActiveTetromino"));
@@ -516,45 +556,48 @@ public class Game : MonoBehaviour
             SpawnNextTetromino();
         }
     }
-    public bool CheckIsInsideGrid (Vector2 pos){
+    public bool CheckIsInsideGrid(Vector2 pos)
+    {
         return ((int)pos.x >= 0 && (int)pos.x < gridWidth && (int)pos.y >= 0);
     }
-    public Vector2 Round (Vector2 pos){
-        return new Vector2 (Mathf.Round(pos.x), Mathf.Round(pos.y));
+    public Vector2 Round(Vector2 pos)
+    {
+        return new Vector2(Mathf.Round(pos.x), Mathf.Round(pos.y));
     }
 
     public bool CheatMino = false;
-    string GetRandomTetromino () {
+    string GetRandomTetromino()
+    {
         int randomTetromino = Random.Range(1, 8);
-        string randomTetrominoName = "Prefabs/Tetrimono_O";
+        string randomTetrominoName = "Prefabs/mino_i";
         if (!CheatMino)
         {
             switch (randomTetromino)
             {
                 case 1:
-                    randomTetrominoName = "Prefabs/Tetrimono_T";
+                    randomTetrominoName = "Prefabs/mino_yellow";
                     break;
                 case 2:
-                    randomTetrominoName = "Prefabs/Tetrimono_I";
+                    randomTetrominoName = "Prefabs/mino_blue";
                     break;
                 case 3:
-                    randomTetrominoName = "Prefabs/Tetrimono_O";
+                    randomTetrominoName = "Prefabs/mino_i";
                     break;
                 case 4:
-                    randomTetrominoName = "Prefabs/Tetrimono_J";
+                    randomTetrominoName = "Prefabs/mino_red";
                     break;
                 case 5:
-                    randomTetrominoName = "Prefabs/Tetrimono_L";
+                    randomTetrominoName = "Prefabs/mino_orange";
                     break;
                 case 6:
-                    randomTetrominoName = "Prefabs/Tetrimono_S";
+                    randomTetrominoName = "Prefabs/mino_cyan";
                     break;
                 case 7:
-                    randomTetrominoName = "Prefabs/Tetrimono_Z";
+                    randomTetrominoName = "Prefabs/mino_magenta";
                     break;
-                //case 8:
-                //    randomTetrominoName = "Prefabs/Tetrimono_V";
-                //    break;
+                    //case 8:
+                    //    randomTetrominoName = "Prefabs/Tetrimono_V";
+                    //    break;
             }
         }
         return randomTetrominoName;
@@ -576,31 +619,33 @@ public class Game : MonoBehaviour
     //}
     //public void MoveDownButton() {
     //    MoveDown = true;
-       
+
     //}
     //public void MoveDownButtonUp() {
     //    MoveDown = false;
-      
+
     //    Tetrimino.movedImmediateVertical = false;
     //}
     //public void MoveRotateButton(){
     //    MoveRotate = true;
     //}
-    public void RestartButton () {
-        SceneManager.LoadScene("Level");
-        
+    public void RestartButton()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
     }
-  
 
 
-    public void GameOver () {
-        UpdateHighScore ();
-        gameover = true;
-        if (gameover) 
-        FindObjectOfType<CanvasUi>().GameOver();
-   
+
+    public void GameOver()
+    {
+        UpdateHighScore();
+        gameOverPanel.SetActive(true);
+        Pause.isPaused = true;
+        Audio.loop = false;
+
         //CanvasPanelOpen(GameOverPanel);
-       
+
         Debug.Log("Game Over");
 
     }

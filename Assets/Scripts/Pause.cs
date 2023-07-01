@@ -4,15 +4,48 @@ using UnityEngine;
 
 public class Pause : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public AudioSource mainMusic;
+    public GameObject trigger;
+    public static bool isPaused = false;
+    
+
     void Start()
     {
         
     }
-
-    // Update is called once per frame
     void Update()
     {
-        
+        StartCoroutine(Pauseaktive());
     }
+    private void OnDisable()
+    {
+        Time.timeScale = 1;
+    }
+
+    IEnumerator Pauseaktive() {
+        if (gameObject.activeSelf)
+        {
+            isPaused = true;
+            if (isPaused)
+            {
+                Time.timeScale = 0;
+            }
+            mainMusic.Pause();
+        }
+        if (!trigger.activeSelf)
+        {
+            isPaused = false;
+            if (!isPaused)
+            {
+                Time.timeScale = 1;
+            }
+            mainMusic.Play();
+        }
+
+        yield return null;
+    }
+
+
+
+
 }

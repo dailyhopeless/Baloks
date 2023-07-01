@@ -124,8 +124,6 @@ public class AudioGame : MonoBehaviour
     }
 
 
-
-
 }
 
 #if UNITY_EDITOR
@@ -139,13 +137,13 @@ public class EditorAudioGame : Editor {
         {
             audioGame.buttonAudio = EditorGUILayout.ObjectField("Audio Button", audioGame.buttonAudio, typeof(AudioClip), true) as AudioClip;
             audioGame.mainAudio = EditorGUILayout.ObjectField("Audio Backsound", audioGame.mainAudio, typeof(AudioClip), true) as AudioClip;
-            audioGame.scoreAudio = EditorGUILayout.ObjectField("Audio Point", audioGame.scoreAudio, typeof(AudioClip), true) as AudioClip;
         }
         if (audioGame.setGameAudio) {
-            audioGame.MoveSound = EditorGUILayout.ObjectField("Audio Move Button", audioGame.buttonAudio, typeof(AudioClip), true) as AudioClip;
-            audioGame.rowSound = EditorGUILayout.ObjectField("Audio row Button", audioGame.buttonAudio, typeof(AudioClip), true) as AudioClip;
-            audioGame.swapSound = EditorGUILayout.ObjectField("Audio swap Button", audioGame.buttonAudio, typeof(AudioClip), true) as AudioClip;
-            audioGame.rotatioSound = EditorGUILayout.ObjectField("Audio rotation Button", audioGame.buttonAudio, typeof(AudioClip), true) as AudioClip;
+            audioGame.scoreAudio = EditorGUILayout.ObjectField("Audio Point", audioGame.scoreAudio, typeof(AudioClip), true) as AudioClip;
+            audioGame.MoveSound = EditorGUILayout.ObjectField("Audio Move Button", audioGame.MoveSound, typeof(AudioClip), true) as AudioClip;
+            audioGame.rowSound = EditorGUILayout.ObjectField("Audio row Button", audioGame.rowSound, typeof(AudioClip), true) as AudioClip;
+            audioGame.swapSound = EditorGUILayout.ObjectField("Audio swap Button", audioGame.swapSound, typeof(AudioClip), true) as AudioClip;
+            audioGame.rotatioSound = EditorGUILayout.ObjectField("Audio rotation Button", audioGame.rotatioSound, typeof(AudioClip), true) as AudioClip;
 
         }
 

@@ -130,14 +130,6 @@ public class Fade : MonoBehaviour
         if(!buttonClose.activeSelf)
             activebool = false;
     }
-
-    public void NotActive() {
-        //gameObject.SetActive(false);
-        //blurPanel.SetActive(false);
-        //Hide
-        activebool = false;
-
-    }
 }
 
 #if UNITY_EDITOR

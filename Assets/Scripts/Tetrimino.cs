@@ -33,14 +33,16 @@ public class Tetrimino : MonoBehaviour
  
     void Update()
     {
-        if (!CanvasUi.isPaused) {
+        if (!Pause.isPaused) {
             CheckUserInput();
             UpdateFallSpeed();
         }
-       
+     
         //UpdateIndividualScore();
 
     }
+
+
     void UpdateFallSpeed () {
         fallSpeed = Game.fallSpeed;
     }
@@ -174,7 +176,7 @@ public class Tetrimino : MonoBehaviour
     }
     IEnumerator Blink()
     {
-        
+        FindObjectOfType<AudioGame>().PlayLineClearedSound();
         FindObjectOfType<Game>().FullAnimatehide();
         yield return new WaitForSeconds(.2f);
         FindObjectOfType<Game>().FullAnimateshow();
@@ -261,14 +263,18 @@ public class Tetrimino : MonoBehaviour
        
         fall = Time.time;
     }
+
     void Rotate()
     {
         if (allowRotation)
         {
-            if (transform.rotation.z >= -90)
+            if (transform.rotation.eulerAngles.z >= -90)
             {
 
-
+                foreach (Transform mino in transform)
+                {
+                    mino.GetComponent<Transform>().transform.Rotate(0, 0, -90);
+                }
                 ButtonFocus.rotation = false;
                 if (limitRotation)
                 {
@@ -288,7 +294,7 @@ public class Tetrimino : MonoBehaviour
                 if (CheckIsValidPosition())
                 {
                     FindObjectOfType<Game>().UpdateGrid(this);
-                    FindObjectOfType<AudioGame>().PlayMoveAudio();
+                    FindObjectOfType<AudioGame>().SoundRotation();
                 }
                 else
                 {
@@ -298,7 +304,7 @@ public class Tetrimino : MonoBehaviour
                         {
                             transform.Rotate(0, 0, -90);
                         }
-                        else
+                        else 
                         {
                             transform.Rotate(0, 0, 90);
                         }
@@ -316,6 +322,8 @@ public class Tetrimino : MonoBehaviour
             ButtonFocus.rotation = false;
         }
     }
+
+
 
 
     bool CheckIsValidPosition()

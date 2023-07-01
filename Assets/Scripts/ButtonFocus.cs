@@ -36,15 +36,6 @@ public class ButtonFocus : MonoBehaviour
     public Vector2 TextButtonBefore;
     public Vector2 TextButtonAfter;
 
-
-    public bool smallButton;
-
-
-    // if have sound 
-    public bool setAudio;
-    public GameObject audioObject;
-
-
     // if for input
     public bool setInput;
     public enum NameInput
@@ -96,6 +87,10 @@ public class ButtonFocus : MonoBehaviour
     {
 
     }
+    private void OnEnable()
+    {
+        DefaultButtonBefore();
+    }
     /// <summary>
     /// Focus for button push add event trigger put in pointer down
     /// </summary>
@@ -123,6 +118,22 @@ public class ButtonFocus : MonoBehaviour
     }
 
 
+    void DefaultButtonBefore() {
+        FocusButton.GetComponent<Image>().sprite = defaultSprite;
+        if (haveBackgroundColor)
+        {
+            ColorButton.GetComponent<Image>().rectTransform.anchoredPosition = ColorButtonPositionBefore;
+        }
+        if (text)
+        {
+            TextButton.GetComponent<TMPro.TextMeshProUGUI>().rectTransform.anchoredPosition = TextButtonBefore;
+        }
+        if (icon)
+        {
+            iconButton.GetComponent<Image>().rectTransform.anchoredPosition = iconButtonBefore;
+        }
+    }
+
     IEnumerator ButtonAnimate(bool value)
     {
         if (useSpriteButton) {
@@ -143,10 +154,7 @@ public class ButtonFocus : MonoBehaviour
             ButtonInput(value);
         }
 
-        if (setAudio)
-        {
-            audioObject.GetComponent<AudioGame>().SoundButton();
-        }
+
         yield return new WaitForSecondsRealtime(0.2f);
 
         if (ForGameObject)
@@ -154,7 +162,7 @@ public class ButtonFocus : MonoBehaviour
 
         if ((ForQuitButton || ForSceneManager))
         {
-          
+            Time.timeScale = 1;
             if (setTransition) {
                 playTrasition.GetComponent<Animator>().runtimeAnimatorController = newController;
              
@@ -188,19 +196,7 @@ public class ButtonFocus : MonoBehaviour
     IEnumerator ButtonAnimateUp(bool value)
     {
         if (useSpriteButton) {
-            FocusButton.GetComponent<Image>().sprite = defaultSprite;
-            if (haveBackgroundColor)
-            {
-                ColorButton.GetComponent<Image>().rectTransform.anchoredPosition = ColorButtonPositionBefore;
-            }
-            if (text)
-            {
-                TextButton.GetComponent<TMPro.TextMeshProUGUI>().rectTransform.anchoredPosition = TextButtonBefore;
-            }
-            if (icon)
-            {
-                iconButton.GetComponent<Image>().rectTransform.anchoredPosition = iconButtonBefore;
-            }
+            DefaultButtonBefore();
         }
         if (setInput) {
             ButtonInput(value);
@@ -266,11 +262,6 @@ public class RandomScript_Editor : Editor
                 EditorGUILayout.Space();
             }
 
-        }
-        script.setAudio = EditorGUILayout.Toggle("Add Audio Button", script.setAudio);
-        if (script.setAudio)
-        {
-            script.audioObject = EditorGUILayout.ObjectField("Add Audio Game Object", script.audioObject, typeof(GameObject), true) as GameObject;
         }
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Functions Buttons", EditorStyles.boldLabel);
