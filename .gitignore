@@ -4,6 +4,7 @@ tes_BurstDebugInformation_DoNotShip/
 Library/
 Logs/
 obj/
+public/
 Packages/
 ProjectSettings/
 Temp/
