@@ -33,10 +33,8 @@ public class GameOver : MonoBehaviour
         if (level < Game.currentLevel)
             level += (1 * Time.unscaledDeltaTime) * 10;
         levelText.text = Mathf.Round(level).ToString();
+        scoreText.text = Game.currentScore.ToString();
 
-        if (score < Game.currentScore)
-            score += (1 * Time.unscaledDeltaTime) * 10;
-        scoreText.text = Mathf.Floor(score).ToString();
         if (line < Game.numLinesCleared)
             line += (1 * Time.unscaledDeltaTime) * 10;
         lineText.text = Mathf.Floor(line).ToString();
@@ -47,21 +45,15 @@ public class GameOver : MonoBehaviour
         }
         else if (Game.startingHighScore < Game.currentScore && Game.tempScore == 0)
         {
-            if ((int)score == Game.currentScore)
-            {
                 if (highscore < Game.currentScore)
                     highscore += (1 * Time.unscaledDeltaTime) * 10f;
                 hightScoreText.text = Mathf.Floor(highscore).ToString();
-            }
+            
         }
         else if (Game.startingHighScore < Game.currentScore)
         {
-
-            if ((int)score == Game.currentScore)
-            {
                 if (highscore < (Game.currentScore - Game.tempScore))
                     highscore += (1 * Time.unscaledDeltaTime) * 10;
-            }
             hightScoreText.text = (Game.tempScore + Mathf.Floor(highscore)).ToString();
 
         }

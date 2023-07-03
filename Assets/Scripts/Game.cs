@@ -77,10 +77,6 @@ public class Game : MonoBehaviour
         SpawnNextTetromino();
 
 
-        //UnPauseButton();
-        //Time.timeScale = 1;
-
-
     }
     void Update()
     {
@@ -101,6 +97,7 @@ public class Game : MonoBehaviour
         {
             GameObject tempNexTetromino = GameObject.FindGameObjectWithTag("currentActiveTetromino");
             SaveTetromino(tempNexTetromino.transform);
+            ButtonFocus.swap = false;
         }
     }
 
@@ -110,7 +107,7 @@ public class Game : MonoBehaviour
         currentScore = 0;
         scoreUi.text = "0";
         //SliderSpeed.maxValue = maxSpeedFall;
-        SliderSpeed.value = PlayerPrefs.GetInt("speedsettings");
+        //SliderSpeed.value = PlayerPrefs.GetInt("speedsettings");
         startingHighScore = PlayerPrefs.GetInt("highscore");
         HighScoreUi.text = startingHighScore.ToString();
         numLinesCleared = 0;
@@ -149,7 +146,7 @@ public class Game : MonoBehaviour
             lines += (4 * Time.deltaTime);
         }
         LinesUi.text = ((int)Mathf.Floor(lines)).ToString();
-        SliderSpeed.minValue = currentLevel;
+       // SliderSpeed.minValue = currentLevel;
     }
 
     void UpdateNewHighScore()
