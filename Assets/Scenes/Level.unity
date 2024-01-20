@@ -7040,7 +7040,7 @@ MonoBehaviour:
   countSpeedText: {fileID: 0}
   ifDisable: {fileID: 1060309262}
   haddle: {fileID: 1060309261}
-  MusicObject: {fileID: 0}
+  MusicObject: {fileID: 2127308908}
 --- !u!1 &1103088273
 GameObject:
   m_ObjectHideFlags: 0
@@ -10510,14 +10510,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   longSlider: 0
   toggleSlider: 1
-  setMusicSettings: 0
+  setMusicSettings: 1
   saveData: 1
   setSliderLong: 6
   setSlidertoggle: 2
   countSpeedText: {fileID: 0}
   ifDisable: {fileID: 1771200905}
   haddle: {fileID: 1771200904}
-  MusicObject: {fileID: 0}
+  MusicObject: {fileID: 2127308908}
 --- !u!1 &1790022599
 GameObject:
   m_ObjectHideFlags: 0
