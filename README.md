@@ -10,4 +10,4 @@ Here is the flowchart for the UI layout of the game I created.
 
 Screenshots
 --------
-![TypeText Screenshot GIF](https://github.com/redbluegames/unity-text-typer/blob/master/README-Images/ss_chat_watermarked.gif)
+![TypeText Screenshot GIF](https://github.com/nndwn/Baloks/blob/main/image/80c276174864763.64a9ba1e8754d.png)
